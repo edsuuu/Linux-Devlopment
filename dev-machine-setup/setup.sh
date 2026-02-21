@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # dev-machine-setup - Script principal de configuração do ambiente
-# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/dev/dev-machine-setup/setup.sh)
+# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/dev-machine-setup/setup.sh)
 # =============================================================================
 
 set -euo pipefail
@@ -46,7 +46,7 @@ run_silent() {
 
     wait "$pid"
     local exit_code=$?
-    printf "\r"  # limpa linha do spinner
+    printf "\r\033[K"  # limpa linha do spinner
 
     if [[ $exit_code -eq 0 ]]; then
         log_success "$msg"
@@ -82,7 +82,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 load_module() {
     local module="$1"
     local path="${SCRIPT_DIR}/lib/${module}.sh"
-
     if [[ -f "$path" ]]; then
         # shellcheck source=/dev/null
         source "$path"
@@ -119,14 +118,9 @@ else
     USE_LOCAL=false
     SCRIPT_DIR="$TEMP_DIR"
     log_info "Modo remoto (curl): baixando módulos..."
-    for mod in packages zsh node php nginx docker folders; do
+    for mod in packages zsh node php nginx docker folders ssh; do
         download_module "$mod"
     done
-    # Baixa também o docker-compose.yml
-    mkdir -p "${TEMP_DIR}/docker"
-    curl -fsSL "${BASE_URL}/docker/docker-compose.yml" -o "${TEMP_DIR}/docker/docker-compose.yml" || {
-        log_warning "Não foi possível baixar docker-compose.yml"
-    }
 fi
 
 # -----------------------------------------------------------------------------
@@ -139,7 +133,7 @@ echo -e "${BOLD}${CYAN}================================================${RESET}\
 detect_environment
 
 # -----------------------------------------------------------------------------
-# Menu interativo para escolha do servidor web
+# Servidor web
 # -----------------------------------------------------------------------------
 echo -e "\n${BOLD}Qual servidor web você deseja instalar?${RESET}"
 echo "  1) Nginx  (recomendado)"
@@ -154,18 +148,17 @@ case "$WEB_SERVER_CHOICE" in
     3) WEB_SERVER="none" ;;
     *) WEB_SERVER="nginx" ;;
 esac
-
 export WEB_SERVER
 
 # -----------------------------------------------------------------------------
-# Versão do PHP (configurável)
+# Versão do PHP
 # -----------------------------------------------------------------------------
 read -rp "Versão do PHP a instalar (padrão: 8.3): " PHP_VERSION
 PHP_VERSION="${PHP_VERSION:-8.3}"
 export PHP_VERSION
 
 # -----------------------------------------------------------------------------
-# Execução dos módulos em ordem
+# Execução dos módulos
 # -----------------------------------------------------------------------------
 load_module "packages"
 install_packages
@@ -190,6 +183,9 @@ fi
 load_module "docker"
 install_docker
 
+load_module "ssh"
+setup_ssh
+
 # -----------------------------------------------------------------------------
 # Limpeza
 # -----------------------------------------------------------------------------
@@ -204,9 +200,12 @@ echo -e "\n${BOLD}${GREEN}================================================${RESE
 echo -e "${BOLD}${GREEN}   Configuração concluída com sucesso!           ${RESET}"
 echo -e "${BOLD}${GREEN}================================================${RESET}"
 echo -e ""
-echo -e "${CYAN}Próximos passos:${RESET}"
-echo -e "  • Reinicie o terminal ou execute: ${BOLD}source ~/.zshrc${RESET}"
-echo -e "  • Seus projetos ficam em: ${BOLD}/var/www/projects${RESET}"
-echo -e "  • Symlink disponível em:  ${BOLD}~/projects${RESET}"
-echo -e "  • Docker Compose em:      ${BOLD}~/docker/docker-compose.yml${RESET}"
+echo -e "${CYAN}Resumo:${RESET}"
+echo -e "  • Projetos em:  ${BOLD}/var/www/projects${RESET}  (symlink: ~/projects)"
+echo -e "  • Docker em:    ${BOLD}~/database/docker-compose.yml${RESET}"
+echo -e "  • Containers:   ${BOLD}MySQL · Postgres · MinIO · Mailpit${RESET}"
 echo -e ""
+echo -e "${YELLOW}Reiniciando no ZSH...${RESET}\n"
+
+# Inicia ZSH ao finalizar
+exec zsh
