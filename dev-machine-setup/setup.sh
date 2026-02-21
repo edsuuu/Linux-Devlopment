@@ -67,10 +67,10 @@ select_arrow() {
 
     while true; do
         local k1 k2 k3
-        IFS= read -rsn1 k1
+        IFS= read -rsn1 k1 </dev/tty
         if [[ "$k1" == $'\x1b' ]]; then
-            IFS= read -rsn1 -t 0.1 k2 || true
-            IFS= read -rsn1 -t 0.1 k3 || true
+            IFS= read -rsn1 -t 0.1 k2 </dev/tty || true
+            IFS= read -rsn1 -t 0.1 k3 </dev/tty || true
             case "${k2}${k3}" in
                 '[A') [[ $selected -gt 0 ]] && selected=$((selected - 1)) || true ;;
                 '[B') [[ $selected -lt $((num - 1)) ]] && selected=$((selected + 1)) || true ;;
