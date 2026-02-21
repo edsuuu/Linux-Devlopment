@@ -10,9 +10,9 @@ install_php() {
             sudo apt-get install -y software-properties-common
     fi
 
-    # Adiciona PPA sempre (LC_ALL=C.UTF-8 obrigatório, garante codename correto)
+    # Adiciona PPA — LC_ALL precisa estar DENTRO do contexto sudo (sudo reseta env vars)
     run_silent "Adicionando repositório ondrej/php" \
-        sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+        sudo bash -c 'LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y'
 
     run_silent "Atualizando repositórios" sudo apt-get update -y
 

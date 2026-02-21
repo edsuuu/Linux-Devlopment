@@ -172,17 +172,17 @@ esac
 export PHP_VERSION
 
 select_arrow "Qual versão do Node.js instalar?" \
-    "Node 22  (LTS ativo - recomendado)" \
-    "Node 24  (LTS atual)" \
     "Node 20  (LTS manutenção)" \
+    "Node 22  (LTS ativo - recomendado)" \
     "Node 23" \
+    "Node 24  (LTS atual)" \
     "Node 25"
 
 case $ARROW_REPLY in
-    0) NODE_VERSION="22" ;;
-    1) NODE_VERSION="24" ;;
-    2) NODE_VERSION="20" ;;
-    3) NODE_VERSION="23" ;;
+    0) NODE_VERSION="20" ;;
+    1) NODE_VERSION="22" ;;
+    2) NODE_VERSION="23" ;;
+    3) NODE_VERSION="24" ;;
     4) NODE_VERSION="25" ;;
 esac
 export NODE_VERSION
