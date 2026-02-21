@@ -10,22 +10,39 @@ install_php() {
             sudo apt-get install -y software-properties-common
     fi
 
-    # Adiciona PPA manualmente (evita bugs do add-apt-repository em WSL)
-    run_silent "Adicionando chave GPG do PHP (ondrej)" \
-        bash -c '
-            sudo mkdir -p /etc/apt/keyrings
-            curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14AA40EC0831756756D7F66C4F4EA0AAE5267A6C" \
-                | sudo gpg --dearmor -o /etc/apt/keyrings/ondrej-php.gpg
-        '
+    local keyring="/usr/share/keyrings/ondrej-php.gpg"
+    local key_id="14AA40EC0831756756D7F66C4F4EA0AAE5267A6C"
+    local codename; codename=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
 
-    run_silent "Adicionando repositório ondrej/php" \
-        bash -c '
-            CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-            echo "deb [signed-by=/etc/apt/keyrings/ondrej-php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu ${CODENAME} main" \
+    # Função interna para gerenciar o PPA de forma robusta
+    setup_php_ppa() {
+        sudo mkdir -p /usr/share/keyrings
+        
+        # Tenta Método 1: gpg direto
+        if [[ ! -s "$keyring" ]]; then
+            sudo gpg --no-default-keyring --keyring "$keyring" \
+                --keyserver hkp://keyserver.ubuntu.com:80 \
+                --recv-keys "$key_id" &>/dev/null || true
+        fi
+
+        # Tenta Método 2: curl fallback
+        if [[ ! -s "$keyring" ]]; then
+            curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${key_id}" \
+                | sudo gpg --dearmor -o "$keyring" 2>/dev/null || true
+        fi
+
+        if [[ -s "$keyring" ]]; then
+            echo "deb [signed-by=${keyring}] https://ppa.launchpadcontent.net/ondrej/php/ubuntu ${codename} main" \
                 | sudo tee /etc/apt/sources.list.d/ondrej-php.list > /dev/null
-        '
+        else
+            # Fallback final: add-apt-repository
+            sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y >/dev/null 2>&1
+        fi
+        
+        sudo apt-get update -y >/dev/null
+    }
 
-    run_silent "Atualizando repositórios" sudo apt-get update -y
+    run_silent "Configurando repositório PHP (ondrej/php)" setup_php_ppa
 
     # Lista de extensões — filtra o que não existir na distro
     local php_packages=(

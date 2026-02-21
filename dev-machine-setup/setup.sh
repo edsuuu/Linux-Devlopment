@@ -15,6 +15,23 @@ log_success() { echo -e "${GREEN}[SUCCESS]${RESET} $*"; }
 log_warning() { echo -e "${YELLOW}[WARNING]${RESET} $*"; }
 log_error()   { echo -e "${RED}[ERROR]${RESET}   $*" >&2; }
 
+BACKGROUND_PIDS=()
+
+cleanup() {
+    local pids=("${BACKGROUND_PIDS[@]}")
+    if [[ ${#pids[@]} -gt 0 ]]; then
+        for pid in "${pids[@]}"; do
+            if kill -0 "$pid" 2>/dev/null; then
+                kill "$pid" 2>/dev/null || true
+            fi
+        done
+    fi
+    # Limpa a linha atual no terminal para evitar poluição visual
+    printf "\r\033[2K" >/dev/tty
+}
+
+trap cleanup EXIT INT TERM
+
 run_silent() {
     local msg="$1"; shift
     local log_file; log_file="$(mktemp)"
@@ -34,6 +51,7 @@ run_silent() {
         done
     ) &
     local spinner_pid=$!
+    BACKGROUND_PIDS+=("$spinner_pid")
 
     wait "$pid"
     local exit_code=$?
@@ -44,13 +62,13 @@ run_silent() {
 
     if [[ $exit_code -eq 0 ]]; then
         log_success "$msg"
+        rm -f "$log_file"
     else
         log_error "Falha: $msg"
-        cat "$log_file" >&2
+        cat "$log_file"
+        rm -f "$log_file"
+        return 1
     fi
-
-    rm -f "$log_file"
-    return $exit_code
 }
 
 select_arrow() {
@@ -121,10 +139,9 @@ download_module() {
     local url="${BASE_URL}/lib/${1}.sh"
     local dest="${TEMP_DIR}/lib/${1}.sh"
     mkdir -p "${TEMP_DIR}/lib"
-    if [[ ! -f "$dest" ]]; then
-        log_info "Baixando módulo: ${1}.sh"
-        curl -fsSL "$url" -o "$dest" || { log_error "Falha ao baixar: $url"; exit 1; }
-    fi
+    # Força redownload sempre para evitar cache stale no modo remoto
+    log_info "Baixando módulo: ${1}.sh"
+    curl -fsSL "$url" -o "$dest" || { log_error "Falha ao baixar: $url"; exit 1; }
 }
 
 if [[ -d "${SCRIPT_DIR}/lib" ]]; then
@@ -148,6 +165,7 @@ echo -e "${BOLD}${YELLOW}Insira sua senha sudo (pedida apenas uma vez):${RESET}"
 sudo -v
 ( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
 SUDO_KEEPALIVE_PID=$!
+BACKGROUND_PIDS+=("$SUDO_KEEPALIVE_PID")
 
 select_arrow "Instalar ZSH + Oh My Zsh?" \
     "Sim  (recomendado)" \
