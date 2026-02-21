@@ -133,7 +133,16 @@ echo -e "${BOLD}${CYAN}================================================${RESET}\
 detect_environment
 
 # -----------------------------------------------------------------------------
-# Servidor web
+# Senha sudo única — pedida uma vez, renovada automaticamente em background
+# -----------------------------------------------------------------------------
+echo -e "${BOLD}${YELLOW}Insira sua senha sudo (pedida apenas uma vez):${RESET}"
+sudo -v
+# Keep-alive: renova o ticket sudo a cada 60s enquanto o script roda
+( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
+SUDO_KEEPALIVE_PID=$!
+
+# -----------------------------------------------------------------------------
+# Perguntas iniciais
 # -----------------------------------------------------------------------------
 echo -e "\n${BOLD}Qual servidor web você deseja instalar?${RESET}"
 echo "  1) Nginx  (recomendado)"
@@ -150,9 +159,6 @@ case "$WEB_SERVER_CHOICE" in
 esac
 export WEB_SERVER
 
-# -----------------------------------------------------------------------------
-# Versão do PHP
-# -----------------------------------------------------------------------------
 read -rp "Versão do PHP a instalar (padrão: 8.3): " PHP_VERSION
 PHP_VERSION="${PHP_VERSION:-8.3}"
 export PHP_VERSION
@@ -189,9 +195,10 @@ setup_ssh
 # -----------------------------------------------------------------------------
 # Limpeza
 # -----------------------------------------------------------------------------
-if [[ "$USE_LOCAL" == "false" ]]; then
-    rm -rf "$TEMP_DIR"
-fi
+[[ "$USE_LOCAL" == "false" ]] && rm -rf "$TEMP_DIR"
+
+# Para o processo keep-alive do sudo
+kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
 # Resumo final
@@ -205,7 +212,6 @@ echo -e "  • Projetos em:  ${BOLD}/var/www/projects${RESET}  (symlink: ~/proje
 echo -e "  • Docker em:    ${BOLD}~/database/docker-compose.yml${RESET}"
 echo -e "  • Containers:   ${BOLD}MySQL · Postgres · MinIO · Mailpit${RESET}"
 echo -e ""
-echo -e "${YELLOW}Reiniciando no ZSH...${RESET}\n"
+echo -e "${YELLOW}Entrando no ZSH...${RESET}\n"
 
-# Inicia ZSH ao finalizar
 exec zsh
