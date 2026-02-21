@@ -24,6 +24,42 @@ log_success() { echo -e "${GREEN}[SUCCESS]${RESET} $*"; }
 log_warning() { echo -e "${YELLOW}[WARNING]${RESET} $*"; }
 log_error()   { echo -e "${RED}[ERROR]${RESET}   $*" >&2; }
 
+# Executa comando em background com spinner animado
+# Uso: run_silent "Mensagem" comando arg1 arg2 ...
+run_silent() {
+    local msg="$1"
+    shift
+    local log_file
+    log_file="$(mktemp)"
+    local spinchars='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local i=0
+
+    "$@" >"$log_file" 2>&1 &
+    local pid=$!
+
+    while kill -0 "$pid" 2>/dev/null; do
+        local char="${spinchars:$((i % ${#spinchars})):1}"
+        printf "\r${CYAN}  %s${RESET}  %s" "$char" "$msg"
+        i=$((i + 1))
+        sleep 0.1
+    done
+
+    wait "$pid"
+    local exit_code=$?
+    printf "\r"  # limpa linha do spinner
+
+    if [[ $exit_code -eq 0 ]]; then
+        log_success "$msg"
+    else
+        log_error "Falha: $msg"
+        cat "$log_file" >&2
+    fi
+
+    rm -f "$log_file"
+    return $exit_code
+}
+export -f run_silent log_info log_success log_warning log_error
+
 # -----------------------------------------------------------------------------
 # Detecção de ambiente
 # -----------------------------------------------------------------------------
