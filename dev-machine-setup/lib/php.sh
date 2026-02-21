@@ -4,6 +4,7 @@ install_php() {
     local version="${PHP_VERSION:-8.3}"
     log_info "Configurando PHP ${version}..."
 
+    # Adiciona PPA e atualiza índice
     if ! grep -rq "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
         run_silent "Adicionando repositório ondrej/php" \
             bash -c 'sudo add-apt-repository ppa:ondrej/php -y && sudo apt-get update -y'
@@ -11,13 +12,12 @@ install_php() {
         run_silent "Atualizando lista de pacotes" sudo apt-get update -y
     fi
 
+    # Valida versão
     if ! apt-cache show "php${version}" &>/dev/null; then
         local available
         available="$(apt-cache search '^php[0-9]\.' | grep -oP 'php\K[0-9]+\.[0-9]+' | sort -u | tr '\n' ' ')"
-        log_error "PHP ${version} não disponível. Versões disponíveis: ${available}"
-        log_warning "Usando PHP 8.3 como fallback."
-        version="8.3"
-        PHP_VERSION="8.3"
+        log_error "PHP ${version} não disponível no repositório. Versões encontradas: ${available:-nenhuma}"
+        return 1
     fi
 
     local php_packages=(
@@ -25,35 +25,49 @@ install_php() {
         "php${version}-common" "php${version}-mysql" "php${version}-pgsql"
         "php${version}-sqlite3" "php${version}-curl" "php${version}-mbstring"
         "php${version}-xml" "php${version}-bcmath" "php${version}-zip"
-        "php${version}-gd" "php${version}-intl" "php${version}-readline"
-        "php${version}-tokenizer" "php${version}-fileinfo"
+        "php${version}-gd" "php${version}-intl"
+        "php${version}-readline" "php${version}-tokenizer" "php${version}-fileinfo"
     )
 
-    local to_install=()
-    local already=()
-
+    local to_install=() already=() unavailable=()
     for pkg in "${php_packages[@]}"; do
-        if ! dpkg -s "$pkg" &>/dev/null; then
+        if dpkg -s "$pkg" &>/dev/null; then
+            already+=("$pkg")
+        elif apt-cache show "$pkg" &>/dev/null 2>&1; then
             to_install+=("$pkg")
         else
-            already+=("$pkg")
+            unavailable+=("$pkg")
         fi
     done
 
     [[ ${#already[@]} -gt 0 ]] && log_warning "Já instalados: ${already[*]}"
+    [[ ${#unavailable[@]} -gt 0 ]] && log_warning "Não disponíveis nesta distro (ignorados): ${unavailable[*]}"
 
     if [[ ${#to_install[@]} -gt 0 ]]; then
         run_silent "Instalando PHP ${version} e extensões" \
-            sudo apt-get install -y "${to_install[@]}"
+            sudo apt-get install -y "${to_install[@]}" || return 1
     else
         log_success "PHP ${version} e extensões já instalados."
     fi
 
+    # Composer — só continua se PHP estiver disponível
+    if ! command -v php &>/dev/null; then
+        log_error "PHP não encontrado no PATH. Pulando Composer e Laravel."
+        return 1
+    fi
+
     if ! command -v composer &>/dev/null; then
         run_silent "Instalando Composer" \
-            bash -c 'curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer'
+            bash -c 'curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer' \
+            || { log_error "Falha ao instalar Composer."; return 1; }
     else
         log_warning "Composer já instalado: $(composer --version --no-ansi 2>/dev/null)"
+    fi
+
+    # Laravel Installer — só continua se Composer estiver disponível
+    if ! command -v composer &>/dev/null; then
+        log_error "Composer não encontrado. Pulando Laravel Installer."
+        return 1
     fi
 
     if ! command -v laravel &>/dev/null; then
@@ -63,7 +77,6 @@ install_php() {
         local composer_bin
         composer_bin="$(composer global config bin-dir --absolute 2>/dev/null || echo "$HOME/.composer/vendor/bin")"
         local path_snippet="export PATH=\"\$PATH:${composer_bin}\""
-
         for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
             [[ -f "$rc" ]] && ! grep -q "composer/vendor/bin" "$rc" && echo "$path_snippet" >> "$rc"
         done
