@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # dev-machine-setup - Script principal de configuração do ambiente
-# Uso: bash <(curl -s https://raw.githubusercontent.com/meuuser/dev-machine-setup/main/setup.sh)
+# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/dev/dev-machine-setup/setup.sh)
 # =============================================================================
 
 set -euo pipefail
