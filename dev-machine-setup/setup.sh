@@ -57,7 +57,7 @@ load_module() {
 }
 
 # Quando executado via curl, os módulos são baixados dinamicamente
-BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/dev/dev-machine-setup}"
+BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/dev-machine-setup}"
 TEMP_DIR="$(mktemp -d)"
 
 download_module() {
