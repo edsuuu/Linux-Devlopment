@@ -4,29 +4,21 @@ install_php() {
     local version="${PHP_VERSION:-8.3}"
     log_info "Configurando PHP ${version}..."
 
-    # Garante software-properties-common (necessário para add-apt-repository)
+    # Garante software-properties-common
     if ! dpkg -s software-properties-common &>/dev/null; then
         run_silent "Instalando software-properties-common" \
             sudo apt-get install -y software-properties-common
     fi
 
-    # Adiciona PPA com locale forçado (obrigatório no Ubuntu 20.04)
+    # Adiciona PPA (LC_ALL=C.UTF-8 obrigatório no Ubuntu 20.04)
     if ! grep -rq "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
         run_silent "Adicionando repositório ondrej/php" \
             sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
     fi
 
-    # Sempre atualiza cache depois de garantir que o PPA está adicionado
     run_silent "Atualizando repositórios" sudo apt-get update -y
 
-    # Valida versão
-    if ! apt-cache show "php${version}" &>/dev/null; then
-        local available
-        available="$(apt-cache search '^php[0-9]\.' | grep -oP 'php\K[0-9]+\.[0-9]+' | sort -u | tr '\n' ' ')"
-        log_error "PHP ${version} não disponível no repositório. Versões encontradas: ${available:-nenhuma}"
-        return 1
-    fi
-
+    # Lista de extensões — filtra o que não existir na distro
     local php_packages=(
         "php${version}" "php${version}-cli" "php${version}-fpm"
         "php${version}-common" "php${version}-mysql" "php${version}-pgsql"
@@ -50,14 +42,18 @@ install_php() {
     [[ ${#already[@]} -gt 0 ]] && log_warning "Já instalados: ${already[*]}"
     [[ ${#unavailable[@]} -gt 0 ]] && log_warning "Não disponíveis nesta distro (ignorados): ${unavailable[*]}"
 
-    if [[ ${#to_install[@]} -gt 0 ]]; then
+    if [[ ${#to_install[@]} -eq 0 && ${#already[@]} -gt 0 ]]; then
+        log_success "PHP ${version} e extensões já instalados."
+    elif [[ ${#to_install[@]} -gt 0 ]]; then
         run_silent "Instalando PHP ${version} e extensões" \
             sudo apt-get install -y "${to_install[@]}" || return 1
     else
-        log_success "PHP ${version} e extensões já instalados."
+        log_error "Nenhum pacote PHP ${version} encontrado no repositório."
+        log_warning "Versões disponíveis: $(apt-cache search '^php[0-9]\.' 2>/dev/null | grep -oP 'php\K[0-9]+\.[0-9]+' | sort -u | tr '\n' ' ')"
+        return 1
     fi
 
-    # Composer — só continua se PHP estiver disponível
+    # Composer
     if ! command -v php &>/dev/null; then
         log_error "PHP não encontrado no PATH. Pulando Composer e Laravel."
         return 1
@@ -71,12 +67,7 @@ install_php() {
         log_warning "Composer já instalado: $(composer --version --no-ansi 2>/dev/null)"
     fi
 
-    # Laravel Installer — só continua se Composer estiver disponível
-    if ! command -v composer &>/dev/null; then
-        log_error "Composer não encontrado. Pulando Laravel Installer."
-        return 1
-    fi
-
+    # Laravel Installer
     if ! command -v laravel &>/dev/null; then
         run_silent "Instalando Laravel Installer" \
             composer global require laravel/installer --quiet
