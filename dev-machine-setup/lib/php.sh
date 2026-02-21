@@ -10,9 +10,20 @@ install_php() {
             sudo apt-get install -y software-properties-common
     fi
 
-    # Adiciona PPA — LC_ALL precisa estar DENTRO do contexto sudo (sudo reseta env vars)
+    # Adiciona PPA manualmente (evita bugs do add-apt-repository em WSL)
+    run_silent "Adicionando chave GPG do PHP (ondrej)" \
+        bash -c '
+            sudo mkdir -p /etc/apt/keyrings
+            curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x14AA40EC0831756756D7F66C4F4EA0AAE5267A6C" \
+                | sudo gpg --dearmor -o /etc/apt/keyrings/ondrej-php.gpg
+        '
+
     run_silent "Adicionando repositório ondrej/php" \
-        sudo bash -c 'LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y'
+        bash -c '
+            CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+            echo "deb [signed-by=/etc/apt/keyrings/ondrej-php.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu ${CODENAME} main" \
+                | sudo tee /etc/apt/sources.list.d/ondrej-php.list > /dev/null
+        '
 
     run_silent "Atualizando repositórios" sudo apt-get update -y
 
