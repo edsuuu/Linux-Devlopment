@@ -1,0 +1,87 @@
+version: "3.9"
+
+# =============================================================================
+# docker-compose.yml padrão para ambiente de desenvolvimento
+# Localização em produção: ~/docker/docker-compose.yml
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # MySQL 8
+  # ---------------------------------------------------------------------------
+  mysql:
+    image: mysql:8
+    container_name: dev_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - dev_network
+
+  # ---------------------------------------------------------------------------
+  # Redis
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:alpine
+    container_name: dev_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - dev_network
+
+  # ---------------------------------------------------------------------------
+  # MailHog (captura de e-mails em desenvolvimento)
+  # ---------------------------------------------------------------------------
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: dev_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Interface web
+    networks:
+      - dev_network
+
+  # ---------------------------------------------------------------------------
+  # MinIO (S3-compatible storage local)
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: dev_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000" # API S3
+      - "9001:9001" # Console web
+    volumes:
+      - minio_data:/data
+    networks:
+      - dev_network
+
+# -----------------------------------------------------------------------------
+# Volumes persistentes
+# -----------------------------------------------------------------------------
+volumes:
+  mysql_data:
+  redis_data:
+  minio_data:
+
+# -----------------------------------------------------------------------------
+# Rede compartilhada entre containers
+# -----------------------------------------------------------------------------
+networks:
+  dev_network:
+    driver: bridge
