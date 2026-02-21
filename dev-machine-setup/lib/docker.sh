@@ -35,16 +35,22 @@ $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" \
         log_warning "Docker já instalado: $(docker --version)"
     fi
 
-    # Inicia o serviço
-    if [[ "${IS_WSL:-false}" == "true" ]]; then
-        run_silent "Iniciando Docker (WSL)" \
-            sudo service docker start || log_warning "Não foi possível iniciar Docker."
+    start_docker() {
+        if sudo service docker start 2>/dev/null; then return 0; fi
+        if sudo /etc/init.d/docker start 2>/dev/null; then return 0; fi
+        if sudo systemctl start docker 2>/dev/null; then return 0; fi
+        return 1
+    }
+
+    if docker info &>/dev/null; then
+        log_warning "Docker já está rodando."
     else
-        sudo systemctl start docker 2>/dev/null || true
-        sudo systemctl enable docker 2>/dev/null || true
+        run_silent "Iniciando Docker" start_docker || {
+            log_error "Não foi possível iniciar Docker. Pulando containers."
+            return 1
+        }
     fi
 
-    # Pasta e docker-compose.yml
     local db_dir="$HOME/database"
     [[ ! -d "$db_dir" ]] && mkdir -p "$db_dir" && log_info "Pasta ~/database criada."
 
@@ -58,10 +64,19 @@ $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" \
         log_warning "~/database/docker-compose.yml já existe."
     fi
 
+    # Sobe cada container individualmente — falha em um não para os outros
     if [[ -f "$compose_dest" ]]; then
-        run_silent "Subindo containers" \
-            sudo docker compose -f "$compose_dest" up -d \
-            || log_warning "Falha ao subir containers. Execute: sudo docker compose -f ~/database/docker-compose.yml up -d"
+        log_info "Subindo containers..."
+        local services
+        mapfile -t services < <(sudo docker compose -f "$compose_dest" config --services 2>/dev/null)
+
+        for service in "${services[@]}"; do
+            local tmp; tmp="$(mktemp)"
+            sudo docker compose -f "$compose_dest" up -d "$service" >"$tmp" 2>&1 \
+                && log_success "Container iniciado: ${service}" \
+                || log_warning "Falha ao subir '${service}'. Verifique: sudo docker compose -f ~/database/docker-compose.yml up -d ${service}"
+            rm -f "$tmp"
+        done
     fi
 
     log_success "Docker pronto. Containers em ~/database/"
