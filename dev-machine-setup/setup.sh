@@ -18,20 +18,29 @@ log_error()   { echo -e "${RED}[ERROR]${RESET}   $*" >&2; }
 run_silent() {
     local msg="$1"; shift
     local log_file; log_file="$(mktemp)"
-    local spinchars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-    local i=0
 
     "$@" >"$log_file" 2>&1 &
     local pid=$!
 
-    while kill -0 "$pid" 2>/dev/null; do
-        printf "\r${CYAN}  %s${RESET}  %s" "${spinchars[$((i % ${#spinchars[@]}))]}" "$msg"
-        i=$((i + 1))
-        sleep 0.1
-    done
+    # Spinner roda num subshell próprio — isolado do set -e
+    (
+        local spinchars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+        local i=0
+        while true; do
+            printf "\033[2K\r${CYAN}  %s${RESET}  %s" \
+                "${spinchars[$((i % 10))]}" "$msg" >/dev/tty
+            i=$(( i + 1 ))
+            sleep 0.1
+        done
+    ) &
+    local spinner_pid=$!
 
-    wait "$pid"; local exit_code=$?
-    printf "\r\033[K"
+    wait "$pid"
+    local exit_code=$?
+
+    kill "$spinner_pid" 2>/dev/null || true
+    wait "$spinner_pid" 2>/dev/null || true
+    printf "\033[2K\r" >/dev/tty
 
     if [[ $exit_code -eq 0 ]]; then
         log_success "$msg"
