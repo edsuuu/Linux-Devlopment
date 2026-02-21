@@ -72,8 +72,8 @@ select_arrow() {
             IFS= read -rsn1 -t 0.1 k2 || true
             IFS= read -rsn1 -t 0.1 k3 || true
             case "${k2}${k3}" in
-                '[A') ((selected > 0)) && ((selected--)) ;;
-                '[B') ((selected < num - 1)) && ((selected++)) ;;
+                '[A') [[ $selected -gt 0 ]] && selected=$((selected - 1)) || true ;;
+                '[B') [[ $selected -lt $((num - 1)) ]] && selected=$((selected + 1)) || true ;;
             esac
         elif [[ "$k1" == '' || "$k1" == $'\n' ]]; then
             break
