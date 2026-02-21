@@ -149,6 +149,12 @@ sudo -v
 ( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
 SUDO_KEEPALIVE_PID=$!
 
+select_arrow "Instalar ZSH + Oh My Zsh?" \
+    "Sim  (recomendado)" \
+    "Não"
+[[ $ARROW_REPLY -eq 0 ]] && INSTALL_ZSH=true || INSTALL_ZSH=false
+export INSTALL_ZSH
+
 select_arrow "Qual servidor web você deseja instalar?" \
     "Nginx  (recomendado)" "Apache" "Nenhum"
 
@@ -203,7 +209,7 @@ run_module() {
 }
 
 run_module "packages" "install_packages"
-run_module "zsh"      "install_zsh"
+[[ "$INSTALL_ZSH" == "true" ]] && run_module "zsh" "install_zsh"
 run_module "node"     "install_node"
 run_module "php"      "install_php"
 run_module "folders"  "setup_folders"
