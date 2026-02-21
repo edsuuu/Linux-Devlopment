@@ -4,13 +4,20 @@ install_php() {
     local version="${PHP_VERSION:-8.3}"
     log_info "Configurando PHP ${version}..."
 
-    # Adiciona PPA e atualiza índice
+    # Garante software-properties-common (necessário para add-apt-repository)
+    if ! dpkg -s software-properties-common &>/dev/null; then
+        run_silent "Instalando software-properties-common" \
+            sudo apt-get install -y software-properties-common
+    fi
+
+    # Adiciona PPA com locale forçado (obrigatório no Ubuntu 20.04)
     if ! grep -rq "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
         run_silent "Adicionando repositório ondrej/php" \
-            bash -c 'sudo add-apt-repository ppa:ondrej/php -y && sudo apt-get update -y'
-    else
-        run_silent "Atualizando lista de pacotes" sudo apt-get update -y
+            sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
     fi
+
+    # Sempre atualiza cache depois de garantir que o PPA está adicionado
+    run_silent "Atualizando repositórios" sudo apt-get update -y
 
     # Valida versão
     if ! apt-cache show "php${version}" &>/dev/null; then
