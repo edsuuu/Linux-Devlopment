@@ -78,7 +78,7 @@ select_arrow() {
         elif [[ "$k1" == '' || "$k1" == $'\n' ]]; then
             break
         fi
-        for (( l=0; l < num + 1; l++ )); do printf '\033[A\033[2K'; done
+        for (( l=0; l < num + 2; l++ )); do printf '\033[A\033[2K'; done
         _draw
     done
 
@@ -167,9 +167,14 @@ FAILED_MODULES=()
 run_module() {
     local name="$1" fn="$2"
     load_module "$name"
-    set +e; $fn; local code=$?; set -e
-    [[ $code -ne 0 ]] && log_warning "Módulo '${name}' falhou. Será retentado no final." \
-        && FAILED_MODULES+=("${name}:${fn}")
+    set +e
+    $fn
+    local code=$?
+    set -e
+    if [[ $code -ne 0 ]]; then
+        log_warning "Módulo '${name}' falhou (código ${code}). Será retentado no final."
+        FAILED_MODULES+=("${name}:${fn}")
+    fi
 }
 
 run_module "packages" "install_packages"
