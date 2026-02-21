@@ -12,16 +12,16 @@ setup_ssh() {
         log_warning "Chave SSH já existe: $key_file"
     else
         echo -e "\n${CYAN}Digite seu e-mail do GitHub para gerar a chave SSH:${RESET}"
-        read -rp "E-mail: " SSH_EMAIL
+        read -rp "E-mail: " SSH_EMAIL </dev/tty
 
         if [[ -z "$SSH_EMAIL" ]]; then
             log_warning "E-mail não informado. Pulando configuração SSH."
             return 0
         fi
 
-        ssh-keygen -t ed25519 -C "$SSH_EMAIL" -N "" -f "$key_file"
+        ssh-keygen -t ed25519 -C "$SSH_EMAIL" -N "" -f "$key_file" &>/dev/null
         eval "$(ssh-agent -s)" > /dev/null 2>&1
-        ssh-add "$key_file"
+        ssh-add "$key_file" &>/dev/null
         log_success "Chave SSH gerada."
     fi
 

@@ -10,11 +10,9 @@ install_php() {
             sudo apt-get install -y software-properties-common
     fi
 
-    # Adiciona PPA (LC_ALL=C.UTF-8 obrigatório no Ubuntu 20.04)
-    if ! grep -rq "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
-        run_silent "Adicionando repositório ondrej/php" \
-            sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
-    fi
+    # Adiciona PPA sempre (LC_ALL=C.UTF-8 obrigatório, garante codename correto)
+    run_silent "Adicionando repositório ondrej/php" \
+        sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
 
     run_silent "Atualizando repositórios" sudo apt-get update -y
 
