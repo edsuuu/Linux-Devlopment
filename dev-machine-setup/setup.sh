@@ -31,7 +31,7 @@ run_silent() {
     shift
     local log_file
     log_file="$(mktemp)"
-    local spinchars='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local spinchars='|/-\'
     local i=0
 
     "$@" >"$log_file" 2>&1 &
