@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 
 set -euo pipefail
 

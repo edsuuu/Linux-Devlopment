@@ -1,92 +1,72 @@
-## Terminal com auto-complete
+## Instalação Automática 
 
-Instalação automatica
+O script configura pacotes, ZSH, Node.js, PHP, Nginx/Apache, Docker e estrutura de pastas.
 
-## Ubuntu 
+### Ubuntu / WSL
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 ```
 
-### Debian
+### Debian (ou sistemas minimalistas)
 
 ```bash
 sudo apt-get update && sudo apt-get install -y curl && bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 ```
 
+## O que é instalado
+
+| Componente      | Detalhes                                      |
+| --------------- | --------------------------------------------- |
+| Pacotes básicos | curl, git, wget, unzip, build-essential, etc. |
+| ZSH             | + Oh My Zsh + autosuggestions + highlighting  |
+| Node.js         | Via NVM, versão LTS mais recente              |
+| PHP             | Versão configurável (8.3, 8.4, etc.)          |
+| Composer        | Via instalador oficial                        |
+| Servidor web    | Nginx (padrão) ou Apache                      |
+| Docker          | Engine + Compose Plugin                       |
 
 
-[TERMINAL_ZSH](Terminal-ZSH/zsh.md)
+---
 
-## NodeJs
+## Instalação Manual e Detalhes
+
+Se preferir configurar manualmente cada componente:
+
+### Terminal e ZSH
+
+[Configuração do ZSH](Terminal-ZSH/zsh.md)
+
+### Node.js (Manual)
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+nvm install 24
 ```
 
-```bash
-\. "$HOME/.nvm/nvm.sh"
-```
-
-```bash
-nvm install 24 && node -v && npm -v 
-```
-
-## PHP 8+
+### PHP 8+ (Manual)
 
 ```bash
 sudo apt-get update && sudo apt install php php-xml php-curl php-mbstring php-pgsql php-mysql php-zip
 ```
 
-### Composer
+### Composer (Manual)
 
 ```bash
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'.PHP_EOL; } else { echo 'Installer corrupt'.PHP_EOL; unlink('composer-setup.php'); exit(1); }"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-sudo mv composer.phar /usr/local/bin/composer
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 ```
 
-## Docker, Banco de dados e APPS Email e S3
+### Docker (Manual)
 
-[Docker](Docker/install.md)
+[Guia do Docker](Docker/install.md)
 
-## SSH GIT
+### SSH e Git
 
-[SSH](SSH/ssh.md)
+[Configurar SSH](SSH/ssh.md)
 
-## Configurando projeto
-[SSH](ConfigProject/install.md)
+### Projetos e Deploys
 
-# Deploys config 
-[CERTIFICADO SSL](Deploy/certificado_ssl.md)
-
-## (Nginx)
-
-[NGINX HTTP NODEJS](Deploy/nginx-HTTP.md)
-
-[NGINX HTTPS NODEJS](Deploy/nginx-HTTPS.md)
-
-### Instalação do NGINX
-
-```bash
-sudo apt install nginx -y && sudo systemctl start nginx
-
-sudo systemctl status nginx
-
-```
-
-```bash
-sudo systemctl status nginx
-
-cd /etc/nginx/sites-enabled/ 
-
-sudo rm -rf default
-
-sudo nano seudominio.com.br
-
-sudo nginx -t && sudo systemctl restart nginx 
-
-```
-## (Apache)
+- [Configuração de Projeto](ConfigProject/install.md)
+- [Certificado SSL](Deploy/certificado_ssl.md)
+- [Nginx HTTP/HTTPS](Deploy/nginx-HTTP.md)
