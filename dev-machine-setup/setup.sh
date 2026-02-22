@@ -232,16 +232,35 @@ case $ARROW_REPLY in
 esac
 export WEB_SERVER
 
-select_arrow "Qual versão do PHP instalar?" \
-    "PHP 8.5  (quando disponível no PPA)" \
-    "PHP 8.4  (estável)" \
-    "PHP 8.3  (estável - recomendado)"
+# Detecção de PHP existente
+CURRENT_PHP_VERSION=""
+if command -v php &>/dev/null; then
+    CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -d "." -f 1,2)
+    log_info "PHP $CURRENT_PHP_VERSION detectado no sistema."
+fi
 
-case $ARROW_REPLY in
-    0) PHP_VERSION="8.5" ;;
-    1) PHP_VERSION="8.4" ;;
-    2) PHP_VERSION="8.3" ;;
-esac
+PHP_OPTIONS=()
+[[ -n "$CURRENT_PHP_VERSION" ]] && PHP_OPTIONS+=("Manter versão atual ($CURRENT_PHP_VERSION)")
+PHP_OPTIONS+=("PHP 8.5 (experimental/PPA)" "PHP 8.4 (estável)" "PHP 8.3 (recomendado)" "Pular instalação do PHP")
+
+select_arrow "Qual versão do PHP instalar?" "${PHP_OPTIONS[@]}"
+
+if [[ -n "$CURRENT_PHP_VERSION" ]]; then
+    case $ARROW_REPLY in
+        0) PHP_VERSION="keep" ;;
+        1) PHP_VERSION="8.5" ;;
+        2) PHP_VERSION="8.4" ;;
+        3) PHP_VERSION="8.3" ;;
+        4) PHP_VERSION="skip" ;;
+    esac
+else
+    case $ARROW_REPLY in
+        0) PHP_VERSION="8.5" ;;
+        1) PHP_VERSION="8.4" ;;
+        2) PHP_VERSION="8.3" ;;
+        3) PHP_VERSION="skip" ;;
+    esac
+fi
 export PHP_VERSION
 
 select_arrow "Qual versão do Node.js instalar?" \
