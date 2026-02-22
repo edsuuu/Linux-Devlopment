@@ -215,12 +215,11 @@ detect_environment
 
 echo -e "${BOLD}${YELLOW}Insira sua senha sudo (pedida apenas uma vez):${RESET}"
 sudo -v
-# Loop de background para manter o sudo ativo sem pedir senha novamente
+
 ( while kill -0 "$$" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 30; done ) &
 SUDO_KEEPALIVE_PID=$!
 BACKGROUND_PIDS+=("$SUDO_KEEPALIVE_PID")
 
-# Alerta para versões antigas do Ubuntu
 if [[ "$OS_ID" == "ubuntu" ]]; then
     OS_VERSION_MAJOR=$(echo "$VERSION_ID" | cut -d. -f1)
     if [[ "$OS_VERSION_MAJOR" -lt 22 ]]; then
@@ -246,7 +245,6 @@ case $ARROW_REPLY in
 esac
 export WEB_SERVER
 
-# Detecção de PHP existente
 CURRENT_PHP_VERSION=""
 if command -v php &>/dev/null; then
     CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -d "." -f 1,2)
