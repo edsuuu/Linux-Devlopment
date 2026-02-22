@@ -15,11 +15,13 @@ install_packages() {
 
     local packages=(
         curl wget git unzip zip build-essential
-        htop tree jq net-tools openssh-client
+        htop tree jq net-tools openssh-client gnupg
     )
 
-    if [[ "$PKG_MANAGER" == "apt-get" ]]; then
-        packages+=(software-properties-common apt-transport-https ca-certificates gnupg lsb-release)
+    if [[ "$PKG_MANAGER" == "apt-get" && "$OS_ID" == "ubuntu" ]]; then
+        packages+=(software-properties-common apt-transport-https ca-certificates lsb-release)
+    elif [[ "$PKG_MANAGER" == "apt-get" && "$OS_ID" == "debian" ]]; then
+        packages+=(apt-transport-https ca-certificates lsb-release)
     fi
 
     local to_install=()

@@ -39,12 +39,6 @@ ${OS_CODENAME} stable\" \
         log_warning "Docker já instalado: $(docker --version)"
     fi
 
-        sudo usermod -aG docker "$USER"
-        log_success "Docker instalado: $(docker --version)"
-    else
-        log_warning "Docker já instalado: $(docker --version)"
-    fi
-
     start_docker() {
         if sudo service docker start 2>/dev/null; then return 0; fi
         if sudo /etc/init.d/docker start 2>/dev/null; then return 0; fi
