@@ -25,7 +25,7 @@ _install_nginx() {
                 bash -c "curl -fsSL https://nginx.org/keys/nginx_signing.key \
                     | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
                     echo \"deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg arch=${arch}] \
-http://nginx.org/packages/${OS_ID} ${OS_CODENAME} nginx\" \
+                    http://nginx.org/packages/${OS_ID} ${OS_CODENAME} nginx\" \
                     | sudo tee /etc/apt/sources.list.d/nginx.list && \
                     sudo apt-get update -y"
         fi

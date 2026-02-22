@@ -18,15 +18,17 @@ log_error()   { echo -e "${RED}[ERROR]${RESET}   $*" >&2; }
 BACKGROUND_PIDS=()
 
 cleanup() {
+    # Restaura o cursor se estiver oculto
+    tput cnorm 2>/dev/null || echo -ne "\033[?25h" >/dev/tty
+    
     local pids=("${BACKGROUND_PIDS[@]}")
     if [[ ${#pids[@]} -gt 0 ]]; then
         for pid in "${pids[@]}"; do
             if kill -0 "$pid" 2>/dev/null; then
-                kill "$pid" 2>/dev/null || true
+                kill -TERM "$pid" 2>/dev/null || true
             fi
         done
     fi
-    # Limpa a linha atual no terminal para evitar poluição visual
     printf "\r\033[2K" >/dev/tty
 }
 
@@ -38,6 +40,7 @@ run_silent() {
 
     "$@" >"$log_file" 2>&1 &
     local pid=$!
+    BACKGROUND_PIDS+=("$pid")
 
     # Spinner roda num subshell próprio — isolado do set -e
     (
