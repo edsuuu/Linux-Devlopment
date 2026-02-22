@@ -184,14 +184,14 @@ esac
 export WEB_SERVER
 
 select_arrow "Qual versão do PHP instalar?" \
-    "PHP 8.3  (estável - recomendado)" \
+    "PHP 8.5  (quando disponível no PPA)" \
     "PHP 8.4  (estável)" \
-    "PHP 8.5  (quando disponível no PPA)"
+    "PHP 8.3  (estável - recomendado)"
 
 case $ARROW_REPLY in
-    0) PHP_VERSION="8.3" ;;
+    0) PHP_VERSION="8.5" ;;
     1) PHP_VERSION="8.4" ;;
-    2) PHP_VERSION="8.5" ;;
+    2) PHP_VERSION="8.3" ;;
 esac
 export PHP_VERSION
 
