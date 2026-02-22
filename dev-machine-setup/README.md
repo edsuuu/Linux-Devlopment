@@ -4,8 +4,18 @@
 
 ## 🚀 Uso rápido
 
+### Ubuntu
+
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/meuuser/dev-machine-setup/main/setup.sh)
+bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
+```
+
+### Debian (ou sistemas sem curl)
+
+Como o Debian minimal não vem com `curl`, use este comando para garantir a instalação antes de rodar:
+
+```bash
+sudo apt-get update && sudo apt-get install -y curl && bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 ```
 
 ## O que é instalado
@@ -68,7 +78,7 @@ dev-machine-setup/
 ## Variáveis de ambiente disponíveis
 
 ```bash
-PHP_VERSION=8.2 bash <(curl -s https://raw.githubusercontent.com/meuuser/dev-machine-setup/main/setup.sh)
+PHP_VERSION=8.4 bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 ```
 
 | Variável    | Padrão | Descrição                     |

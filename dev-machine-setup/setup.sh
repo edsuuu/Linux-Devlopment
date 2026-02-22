@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/dev-machine-setup/setup.sh)
+# Uso: bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
 
 set -euo pipefail
 
@@ -117,13 +117,62 @@ select_arrow() {
 export -f run_silent log_info log_success log_warning log_error
 
 detect_environment() {
+    log_info "Detectando ambiente e distribuição..."
+
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        OS_ID=$ID
+        OS_CODENAME=${UBUNTU_CODENAME:-$VERSION_CODENAME}
+    else
+        OS_ID=$(uname -s | tr '[:upper:]' '[:lower:]')
+        OS_CODENAME=""
+    fi
+
     if grep -qEi "(microsoft|wsl)" /proc/version 2>/dev/null; then
         IS_WSL=true; log_info "Ambiente WSL detectado."
     else
         IS_WSL=false; log_info "Ambiente Linux nativo detectado."
     fi
-    export IS_WSL
+
+    # Identifica o gerenciador de pacotes
+    if command -v apt-get &>/dev/null; then
+        PKG_MANAGER="apt-get"
+    elif command -v dnf &>/dev/null; then
+        PKG_MANAGER="dnf"
+    elif command -v pacman &>/dev/null; then
+        PKG_MANAGER="pacman"
+    elif command -v zypper &>/dev/null; then
+        PKG_MANAGER="zypper"
+    else
+        log_error "Gerenciador de pacotes não suportado automaticamente."
+        exit 1
+    fi
+
+    log_info "Distro: ${OS_ID} (${OS_CODENAME}), Gerenciador: ${PKG_MANAGER}"
+
+    export IS_WSL OS_ID OS_CODENAME PKG_MANAGER
 }
+
+# Wrapper genérico para instalação de pacotes
+pkg_install() {
+    local msg="$1"; shift
+    case "$PKG_MANAGER" in
+        apt-get)
+            run_silent "$msg" sudo apt-get install -y "$@"
+            ;;
+        dnf)
+            run_silent "$msg" sudo dnf install -y "$@"
+            ;;
+        pacman)
+            run_silent "$msg" sudo pacman -S --noconfirm "$@"
+            ;;
+        zypper)
+            run_silent "$msg" sudo zypper install -y "$@"
+            ;;
+    esac
+}
+
+export -f pkg_install
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

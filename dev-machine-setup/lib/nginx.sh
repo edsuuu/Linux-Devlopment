@@ -16,21 +16,24 @@ _install_nginx() {
         return 0
     fi
 
-    local arch codename
-    arch="$(dpkg --print-architecture)"
-    codename="$(lsb_release -cs)"
+    if [[ "$PKG_MANAGER" == "apt-get" ]]; then
+        local arch
+        arch="$(dpkg --print-architecture)"
 
-    if [[ ! -f /etc/apt/sources.list.d/nginx.list ]]; then
-        run_silent "Adicionando repositório oficial do Nginx" \
-            bash -c "curl -fsSL https://nginx.org/keys/nginx_signing.key \
-                | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
-                echo \"deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg arch=${arch}] \
-http://nginx.org/packages/ubuntu ${codename} nginx\" \
-                | sudo tee /etc/apt/sources.list.d/nginx.list && \
-                sudo apt-get update -y"
+        if [[ ! -f /etc/apt/sources.list.d/nginx.list ]]; then
+            run_silent "Adicionando repositório oficial do Nginx" \
+                bash -c "curl -fsSL https://nginx.org/keys/nginx_signing.key \
+                    | sudo gpg --dearmor -o /usr/share/keyrings/nginx-archive-keyring.gpg && \
+                    echo \"deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg arch=${arch}] \
+http://nginx.org/packages/${OS_ID} ${OS_CODENAME} nginx\" \
+                    | sudo tee /etc/apt/sources.list.d/nginx.list && \
+                    sudo apt-get update -y"
+        fi
+
+        run_silent "Instalando Nginx" sudo apt-get install -y nginx
+    else
+        pkg_install "Instalando Nginx" nginx
     fi
-
-    run_silent "Instalando Nginx" sudo apt-get install -y nginx
     sudo systemctl enable nginx 2>/dev/null || true
     log_success "Nginx instalado: $(nginx -v 2>&1)"
 }

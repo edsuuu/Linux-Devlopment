@@ -4,7 +4,7 @@ install_zsh() {
     log_info "Configurando ZSH + Oh My Zsh..."
 
     if ! command -v zsh &>/dev/null; then
-        run_silent "Instalando ZSH" sudo apt-get install -y zsh
+        pkg_install "Instalando ZSH" zsh
     else
         log_warning "ZSH já instalado: $(zsh --version)"
     fi
