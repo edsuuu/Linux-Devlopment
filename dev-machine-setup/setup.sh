@@ -212,7 +212,7 @@ detect_environment
 
 echo -e "${BOLD}${YELLOW}Insira sua senha sudo (pedida apenas uma vez):${RESET}"
 sudo -v
-( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 60; done ) &
+( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 30; done ) &
 SUDO_KEEPALIVE_PID=$!
 BACKGROUND_PIDS+=("$SUDO_KEEPALIVE_PID")
 
@@ -265,10 +265,10 @@ export PHP_VERSION
 
 select_arrow "Qual versão do Node.js instalar?" \
     "Node 25" \
-    "Node 24" \
+    "Node 24  (LTS atual)" \
     "Node 23" \
-    "Node 22" \
-    "Node 20"
+    "Node 22  (LTS ativo - recomendado)" \
+    "Node 20  (LTS manutenção)"
 
 case $ARROW_REPLY in
     0) NODE_VERSION="25" ;;
@@ -283,6 +283,8 @@ FAILED_MODULES=()
 
 run_module() {
     local name="$1" fn="$2"
+    # Refreshes the sudo to avoid interruptions after long tasks
+    sudo -n true 2>/dev/null || sudo -v
     load_module "$name"
     set +e
     $fn

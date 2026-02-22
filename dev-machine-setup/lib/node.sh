@@ -28,11 +28,16 @@ export NVM_DIR="$HOME/.nvm"
     set -u
 
     if command -v nvm &>/dev/null; then
-        run_silent "Instalando Node.js ${version}" \
-            bash -c "export NVM_DIR=\"$nvm_dir\" && source \"$NVM_DIR/nvm.sh\" && nvm install ${version} && nvm alias default ${version}"
+        if nvm ls "$version" &>/dev/null; then
+            log_info "Node.js ${version} já está instalado via NVM."
+        else
+            run_silent "Instalando Node.js ${version}" \
+                bash -c "export NVM_DIR=\"$nvm_dir\" && source \"$NVM_DIR/nvm.sh\" && nvm install ${version} && nvm alias default ${version}"
+            log_success "Node.js ${version} instalado com sucesso."
+        fi
     else
         log_warning "NVM não disponível na sessão. Execute: nvm install ${version}"
     fi
 
-    log_success "NVM + Node.js ${version} configurados."
+    log_success "NVM + Node.js ${version} prontos."
 }
