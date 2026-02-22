@@ -72,9 +72,10 @@ ${OS_CODENAME} stable\" \
     if [[ -f "$compose_dest" ]]; then
         log_info "Subindo containers..."
         local services
-        mapfile -t services < <(sudo docker compose -f "$compose_dest" config --services 2>/dev/null)
+        # Uso do sudo explicitamente aqui também
+        services=$(sudo docker compose -f "$compose_dest" config --services 2>/dev/null) || services=""
 
-        for service in "${services[@]}"; do
+        for service in $services; do
             local tmp; tmp="$(mktemp)"
             sudo docker compose -f "$compose_dest" up -d "$service" >"$tmp" 2>&1 \
                 && log_success "Container iniciado: ${service}" \

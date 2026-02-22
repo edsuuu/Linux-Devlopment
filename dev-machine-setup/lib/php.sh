@@ -51,10 +51,12 @@ install_php() {
 
     if ! command -v composer &>/dev/null; then
         run_silent "Instalando Composer" \
-            bash -c 'curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer'
+            bash -c 'curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer'
     fi
 
     if ! command -v laravel &>/dev/null; then
+        # Garante que o composer está acessível se acabou de ser instalado
+        export PATH="/usr/local/bin:$PATH"
         run_silent "Instalando Laravel Installer" \
             composer global require laravel/installer --quiet
         
@@ -63,6 +65,8 @@ install_php() {
         for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
             [[ -f "$rc" ]] && ! grep -q "composer/vendor/bin" "$rc" && echo "$path_snippet" >> "$rc"
         done
+        # Atualiza PATH atual para o resto do script
+        export PATH="$PATH:${composer_bin}"
     fi
 
     log_success "PHP ${version}, Composer e Laravel Installer prontos"
