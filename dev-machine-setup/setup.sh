@@ -265,10 +265,10 @@ export PHP_VERSION
 
 select_arrow "Qual versão do Node.js instalar?" \
     "Node 25" \
-    "Node 24  (LTS atual)" \
+    "Node 24" \
     "Node 23" \
-    "Node 22  (LTS ativo - recomendado)" \
-    "Node 20  (LTS manutenção)"
+    "Node 22" \
+    "Node 20"
 
 case $ARROW_REPLY in
     0) NODE_VERSION="25" ;;

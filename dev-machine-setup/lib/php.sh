@@ -58,6 +58,15 @@ install_php() {
 
     pkg_install "Garantindo pacotes PHP ${version} e extensões" "${php_packages[@]}" || return 1
 
+    # Alterna a versão padrão do sistema
+    log_info "Definindo PHP ${version} como padrão do sistema..."
+    local binaries=("php" "php-fpm" "phar" "phar.phar" "php-cgi" "php-dbg" "php_dbg")
+    for bin in "${binaries[@]}"; do
+        if [[ -f "/usr/bin/${bin}${version}" ]]; then
+            sudo update-alternatives --set "$bin" "/usr/bin/${bin}${version}" &>/dev/null || true
+        fi
+    done
+
     if ! command -v composer &>/dev/null; then
         run_silent "Instalando Composer" \
             bash -c 'curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer'
