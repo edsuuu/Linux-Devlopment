@@ -215,9 +215,20 @@ detect_environment
 
 echo -e "${BOLD}${YELLOW}Insira sua senha sudo (pedida apenas uma vez):${RESET}"
 sudo -v
-( while kill -0 "$$" 2>/dev/null; do sudo -n true; sleep 30; done ) &
+# Loop de background para manter o sudo ativo sem pedir senha novamente
+( while kill -0 "$$" 2>/dev/null; do sudo -n -v 2>/dev/null; sleep 30; done ) &
 SUDO_KEEPALIVE_PID=$!
 BACKGROUND_PIDS+=("$SUDO_KEEPALIVE_PID")
+
+# Alerta para versões antigas do Ubuntu
+if [[ "$OS_ID" == "ubuntu" ]]; then
+    OS_VERSION_MAJOR=$(echo "$VERSION_ID" | cut -d. -f1)
+    if [[ "$OS_VERSION_MAJOR" -lt 22 ]]; then
+        echo -e "\n${BOLD}${YELLOW}![AVISO]${RESET} Você está no Ubuntu ${VERSION_ID}."
+        echo -e "${YELLOW}Versões abaixo do 22.04 podem ter instabilidades com PHP 8.4+.${RESET}"
+        echo -e "${YELLOW}Recomendamos PHP 8.3 ou upgrade da distro para melhor performance.${RESET}\n"
+    fi
+fi
 
 select_arrow "Instalar ZSH + Oh My Zsh?" \
     "Sim  (recomendado)" \
@@ -286,8 +297,6 @@ FAILED_MODULES=()
 
 run_module() {
     local name="$1" fn="$2"
-    # Refreshes the sudo to avoid interruptions after long tasks
-    sudo -n true 2>/dev/null || sudo -v
     load_module "$name"
     set +e
     $fn

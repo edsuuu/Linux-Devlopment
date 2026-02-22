@@ -56,7 +56,8 @@ install_php() {
         "php${version}-readline" "php${version}-tokenizer" "php${version}-fileinfo"
     )
 
-    pkg_install "Garantindo pacotes PHP ${version} e extensões" "${php_packages[@]}" || return 1
+    pkg_install "Garantindo pacotes PHP ${version} e extensões" \
+        bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y ${php_packages[*]}" || return 1
 
     # Alterna a versão padrão do sistema
     log_info "Definindo PHP ${version} como padrão do sistema..."
