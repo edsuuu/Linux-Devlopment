@@ -25,16 +25,12 @@ setup_folders() {
         log_success "Symlink criado: $symlink -> $projects_dir"
     fi
 
-    # Pasta de Configurações do Servidor Web
-    local configs_dir="/var/www/configs"
-    if [[ ! -d "$configs_dir" ]]; then
-        sudo mkdir -p "$configs_dir"
-        sudo chown -R "$USER":"$(id -gn)" "$configs_dir"
-        log_success "Pasta de configurações criada: $configs_dir"
-    else
-        log_warning "Pasta de configurações já existe: $configs_dir"
-        sudo chown -R "$USER":"$(id -gn)" "$configs_dir"
-    fi
+    local target_config_dir=""
+    case "${WEB_SERVER:-none}" in
+        nginx)  target_config_dir="/etc/nginx/sites-available" ;;
+        apache) target_config_dir="/etc/apache2/sites-available" ;;
+        *)      log_info "Nenhum servidor web selecionado. Pulando symlink de configs." ; return 0 ;;
+    esac
 
     local configs_symlink="$HOME/configs"
     if [[ -L "$configs_symlink" ]]; then
@@ -42,7 +38,7 @@ setup_folders() {
     elif [[ -d "$configs_symlink" ]]; then
         log_warning "Pasta real em $configs_symlink. Não será sobrescrita."
     else
-        ln -s "$configs_dir" "$configs_symlink"
-        log_success "Symlink de configs criado: $configs_symlink -> $configs_dir"
+        ln -s "$target_config_dir" "$configs_symlink"
+        log_success "Symlink de configs criado: $configs_symlink -> $target_config_dir"
     fi
 }

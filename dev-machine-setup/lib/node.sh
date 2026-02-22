@@ -14,9 +14,9 @@ install_node() {
     fi
 
     local nvm_snippet='
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
 
     for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
         [[ -f "$rc" ]] && ! grep -q 'NVM_DIR' "$rc" && echo "$nvm_snippet" >> "$rc"

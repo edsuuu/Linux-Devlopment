@@ -18,7 +18,6 @@ log_error()   { echo -e "${RED}[ERROR]${RESET}   $*" >&2; }
 BACKGROUND_PIDS=()
 
 cleanup() {
-    # Restaura o cursor se estiver oculto
     tput cnorm 2>/dev/null || echo -ne "\033[?25h" >/dev/tty
     
     local pids=("${BACKGROUND_PIDS[@]}")
@@ -42,7 +41,6 @@ run_silent() {
     local pid=$!
     BACKGROUND_PIDS+=("$pid")
 
-    # Spinner roda num subshell próprio — isolado do set -e
     (
         local spinchars=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
         local i=0
@@ -137,7 +135,6 @@ detect_environment() {
         IS_WSL=false; log_info "Ambiente Linux nativo detectado."
     fi
 
-    # Identifica o gerenciador de pacotes
     if command -v apt-get &>/dev/null; then
         PKG_MANAGER="apt-get"
     elif command -v dnf &>/dev/null; then
@@ -156,7 +153,6 @@ detect_environment() {
     export IS_WSL OS_ID OS_CODENAME PKG_MANAGER
 }
 
-# Wrapper genérico para instalação de pacotes
 pkg_install() {
     local msg="$1"; shift
     case "$PKG_MANAGER" in
@@ -191,7 +187,6 @@ download_module() {
     local url="${BASE_URL}/lib/${1}.sh"
     local dest="${TEMP_DIR}/lib/${1}.sh"
     mkdir -p "${TEMP_DIR}/lib"
-    # Força redownload sempre para evitar cache stale no modo remoto
     log_info "Baixando módulo: ${1}.sh"
     curl -fsSL "$url" -o "$dest" || { log_error "Falha ao baixar: $url"; exit 1; }
 }
@@ -207,9 +202,16 @@ else
     done
 fi
 
-echo -e "\n${BOLD}${CYAN}================================================${RESET}"
-echo -e "${BOLD}${CYAN}   dev-machine-setup - Configuração Automática   ${RESET}"
-echo -e "${BOLD}${CYAN}================================================${RESET}\n"
+echo -e "${CYAN}${BOLD}"
+cat << "EOF"
+    ____               __  __           _     _                _____      _                 
+   |  _ \  _____   __/  \/  | __ _  ___| |__ (_)_ __   ___    / ____| ___| |_ _   _ _ __    
+   | | | |/ _ \ \ / /| \  / |/ _` |/ __| '_ \| | '_ \ / _ \   \___ \ / _ \ __| | | | '_ \   
+   | |_| |  __/\ V / | |\/| | (_| | (__| | | | | | | |  __/    ___) |  __/ |_| |_| | |_) |  
+   |____/ \___| \_/  |_|  |_|\__,_|\___|_| |_|_|_| |_|\___|   |____/ \___|\__|\__,_| .__/   
+                                                                                   |_|      
+EOF
+echo -e "${RESET}"
 
 detect_environment
 
@@ -337,9 +339,17 @@ fi
 [[ "$USE_LOCAL" == "false" ]] && rm -rf "$TEMP_DIR"
 kill "$SUDO_KEEPALIVE_PID" 2>/dev/null || true
 
-echo -e "\n${BOLD}${GREEN}================================================${RESET}"
-echo -e "${BOLD}${GREEN}   Configuração concluída!                       ${RESET}"
-echo -e "${BOLD}${GREEN}================================================${RESET}"
+echo -e "${GREEN}${BOLD}"
+cat << "EOF"
+    _____ ______ _______ _    _ _____     _____ ____  __  __ _____  _      ______ _______ ______ 
+   / ____|  ____|__   __| |  | |  __ \   / ____/ __ \|  \/  |  __ \| |    |  ____|__   __|  ____|
+  | (___ | |__     | |  | |  | | |__) | | |   | |  | | \  / | |__) | |    | |__     | |  | |__   
+   \___ \|  __|    | |  | |  | |  ___/  | |   | |  | | |\/| |  ___/| |    |  __|    | |  |  __|  
+   ____) | |____   | |  | |__| | |      | |___| |__| | |  | | |    | |____| |____   | |  | |____ 
+  |_____/|______|  |_|   \____/|_|       \_____\____/|_|  |_|_|    |______|______|  |_|  |______|
+
+EOF
+echo -e "${RESET}"
 echo -e ""
 echo -e "  • Projetos: ${BOLD}/var/www/projects${RESET}  →  ~/projects"
 echo -e "  • Docker:   ${BOLD}~/database/docker-compose.yml${RESET}"

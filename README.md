@@ -1,5 +1,21 @@
 ## Terminal com auto-complete
 
+Instalação automatica
+
+## Ubuntu 
+
+```bash
+bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
+```
+
+### Debian
+
+```bash
+sudo apt-get update && sudo apt-get install -y curl && bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
+```
+
+
+
 [TERMINAL_ZSH](Terminal-ZSH/zsh.md)
 
 ## NodeJs

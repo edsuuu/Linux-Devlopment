@@ -59,7 +59,6 @@ install_php() {
     pkg_install "Garantindo pacotes PHP ${version} e extensões" \
         bash -c "DEBIAN_FRONTEND=noninteractive apt-get install -y ${php_packages[*]}" || return 1
 
-    # Alterna a versão padrão do sistema
     log_info "Definindo PHP ${version} como padrão do sistema..."
     local binaries=("php" "php-fpm" "phar" "phar.phar" "php-cgi" "php-dbg" "php_dbg")
     for bin in "${binaries[@]}"; do
@@ -74,8 +73,8 @@ install_php() {
     fi
 
     if ! command -v laravel &>/dev/null; then
-        # Garante que o composer está acessível se acabou de ser instalado
         export PATH="/usr/local/bin:$PATH"
+
         run_silent "Instalando Laravel Installer" \
             composer global require laravel/installer --quiet
         
@@ -84,7 +83,7 @@ install_php() {
         for rc in "$HOME/.zshrc" "$HOME/.bashrc"; do
             [[ -f "$rc" ]] && ! grep -q "composer/vendor/bin" "$rc" && echo "$path_snippet" >> "$rc"
         done
-        # Atualiza PATH atual para o resto do script
+
         export PATH="$PATH:${composer_bin}"
     fi
 

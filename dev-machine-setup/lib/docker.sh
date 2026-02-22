@@ -19,8 +19,8 @@ install_docker() {
             run_silent "Adicionando repositório do Docker" \
                 bash -c "
                     echo \"deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-https://download.docker.com/linux/${OS_ID} \
-${OS_CODENAME} stable\" \
+                    https://download.docker.com/linux/${OS_ID} \
+                    ${OS_CODENAME} stable\" \
                     | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
                     sudo apt-get update -y
                 "
