@@ -179,7 +179,7 @@ load_module() {
     [[ -f "$path" ]] && source "$path" || { log_error "Módulo não encontrado: $path"; exit 1; }
 }
 
-BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/dev-machine-setup}"
+BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/scripts/dev-machine-setup}"
 TEMP_DIR="$(mktemp -d)"
 
 download_module() {
