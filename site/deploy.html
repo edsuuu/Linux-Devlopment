@@ -1,153 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Servidor de deploy (Laravel) — Linux Development</title>
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet">
-    <link rel="stylesheet" href="assets/style.css">
-    <script src="assets/app.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servidor de deploy (Laravel) — Linux Development</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/app.js"></script>
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-sans antialiased">
 
 <header class="lg:hidden sticky top-0 z-40 flex items-center gap-3 border-b border-[var(--line)] bg-[var(--bg)]/95 px-4 py-3 backdrop-blur">
-    <button id="menu-btn" aria-label="Abrir menu" class="rounded p-1.5 text-[var(--dim)] hover:text-[var(--bright)]">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18M3 12h18M3 18h18"/>
-        </svg>
-    </button>
-    <span class="font-display font-semibold text-[var(--bright)]">Linux Development</span>
+  <button id="menu-btn" aria-label="Abrir menu" class="rounded p-1.5 text-[var(--dim)] hover:text-[var(--bright)]">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <span class="font-display font-semibold text-[var(--bright)]">Linux Development</span>
 </header>
 
 <div class="flex">
 
-    <aside id="sidebar"
-           class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-y-auto border-r border-[var(--line)] bg-[var(--surface)] px-6 py-8 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
-        <a href="../index.html" class="mb-8 block">
-            <div class="font-display text-xl font-bold text-[var(--bright)]">Linux Development</div>
-            <div class="mt-1 text-sm text-[var(--dim)]">Docs &amp; scripts</div>
-        </a>
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-y-auto border-r border-[var(--line)] bg-[var(--surface)] px-6 py-8 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
+    <a href="../index.html" class="mb-8 block">
+      <div class="font-display text-xl font-bold text-[var(--bright)]">Linux Development</div>
+      <div class="mt-1 text-sm text-[var(--dim)]">Docs &amp; scripts</div>
+    </a>
 
-        <nav class="space-y-7 text-[15px]">
-            <div>
-                <div class="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--dim)]">Setup</div>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="../index.html">Configurar máquina local</a>
-                <a class="nav-link active block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="deploy.html">Servidor de deploy</a>
-            </div>
-            <div>
-                <div class="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--dim)]">Guias</div>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="zsh.html">Terminal &amp; ZSH</a>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="ssh.html">SSH</a>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="docker.html">Docker</a>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="nginx.html">Nginx HTTPS</a>
-                <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]"
-                   href="ssl.html">Certificado SSL</a>
-            </div>
-        </nav>
+    <nav class="space-y-7 text-[15px]">
+      <div>
+        <div class="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--dim)]">Setup</div>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="../index.html">Configurar máquina local</a>
+        <a class="nav-link active block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="deploy.html">Servidor de deploy</a>
+      </div>
+      <div>
+        <div class="mb-2 font-mono text-xs uppercase tracking-widest text-[var(--dim)]">Guias</div>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="zsh.html">Terminal &amp; ZSH</a>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="ssh.html">SSH</a>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="docker.html">Docker</a>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="nginx.html">Nginx HTTPS</a>
+        <a class="nav-link block border-l-2 border-transparent py-1.5 pl-4 text-[var(--dim)] hover:text-[var(--bright)]" href="ssl.html">Certificado SSL</a>
+      </div>
+    </nav>
 
-        <a class="mt-auto flex items-center gap-2 pt-8 text-[15px] text-[var(--dim)] hover:text-[var(--bright)]"
-           href="https://github.com/edsuuu/Linux-Devlopment" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/>
-            </svg>
-            GitHub
-        </a>
-    </aside>
-    <div id="overlay" class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"></div>
+    <a class="mt-auto flex items-center gap-2 pt-8 text-[15px] text-[var(--dim)] hover:text-[var(--bright)]" href="https://github.com/edsuuu/Linux-Devlopment" target="_blank" rel="noopener">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+      GitHub
+    </a>
+  </aside>
+  <div id="overlay" class="fixed inset-0 z-40 hidden bg-black/60 lg:hidden"></div>
 
-    <main class="min-w-0 flex-1 px-5 py-10 sm:px-10 lg:px-14">
-        <div class="mx-auto max-w-6xl">
+  <main class="min-w-0 flex-1 px-5 py-10 sm:px-10 lg:px-14">
+    <div class="mx-auto max-w-6xl">
 
-            <section class="mb-16">
-                <div class="flex flex-wrap items-baseline justify-between gap-2">
-                    <h1 class="font-display text-3xl font-bold text-[var(--bright)]">Servidor de deploy (Laravel)</h1>
-                    <a class="text-[15px] text-[var(--accent)] hover:underline"
-                       href="https://github.com/edsuuu/Linux-Devlopment/blob/main/scripts/deploy/setup.sh"
-                       target="_blank" rel="noopener">ver o script</a>
-                </div>
-                <p class="mt-2 text-[var(--dim)]">Provisiona o servidor, cria a estrutura do projeto e gera o script de
-                    deploy zero-downtime.</p>
+    <section class="mb-16">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h1 class="font-display text-3xl font-bold text-[var(--bright)]">Servidor de deploy (Laravel)</h1>
+        <a class="text-[15px] text-[var(--accent)] hover:underline" href="https://github.com/edsuuu/Linux-Devlopment/blob/main/scripts/deploy/setup.sh" target="_blank" rel="noopener">ver o script</a>
+      </div>
+      <p class="mt-2 text-[var(--dim)]">Provisiona o servidor, cria a estrutura do projeto e gera o script de deploy zero-downtime.</p>
 
-                <div class="cb mt-6" data-label="bash">
-                    <pre><code>bash &lt;(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/scripts/deploy/setup.sh)</code></pre>
-                </div>
+      <div class="cb mt-6" data-label="bash">
+        <pre><code>bash &lt;(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/scripts/deploy/setup.sh)</code></pre>
+      </div>
 
-                <p class="mt-4 text-[var(--dim)]">Ao iniciar, o script pergunta o modo:</p>
-                <div class="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div class="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
-                        <p class="font-mono text-sm text-[var(--accent)]">1) Instalação completa</p>
-                        <p class="mt-1 text-[15px] text-[var(--dim)]">Instala o servidor (tabela abaixo) e em seguida
-                            cria o projeto. Use num servidor novo.</p>
-                    </div>
-                    <div class="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
-                        <p class="font-mono text-sm text-[var(--accent)]">2) Apenas o projeto</p>
-                        <p class="mt-1 text-[15px] text-[var(--dim)]">Pula a instalação e só cria a estrutura e o script
-                            de deploy. Use quando o servidor já está pronto.</p>
-                    </div>
-                </div>
+      <p class="mt-4 text-[var(--dim)]">Ao iniciar, o script pergunta o modo — navegue com as setas ↑ ↓ e confirme com Enter:</p>
+      <div class="mt-3 grid gap-3 sm:grid-cols-2">
+        <div class="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
+          <p class="font-mono text-sm text-[var(--accent)]">1) Instalação completa</p>
+          <p class="mt-1 text-[15px] text-[var(--dim)]">Instala o servidor (tabela abaixo) e em seguida cria o projeto. Use num servidor novo.</p>
+        </div>
+        <div class="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4">
+          <p class="font-mono text-sm text-[var(--accent)]">2) Apenas o projeto</p>
+          <p class="mt-1 text-[15px] text-[var(--dim)]">Pula a instalação e só cria a estrutura e o script de deploy. Use quando o servidor já está pronto.</p>
+        </div>
+      </div>
 
-                <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">O que a instalação completa
-                    instala</h2>
-                <div class="mt-4 overflow-x-auto rounded-lg border border-[var(--line)]">
-                    <table class="w-full min-w-[520px] text-left text-[15px]">
-                        <thead class="bg-[var(--raise)] font-mono text-xs uppercase tracking-wider text-[var(--dim)]">
-                        <tr>
-                            <th class="px-4 py-3">Item</th>
-                            <th class="px-4 py-3">Detalhes</th>
-                        </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[var(--line)]">
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">PHP</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Versão disponível no apt do sistema, com as
-                                extensões <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">cli
-                                    fpm mbstring xml curl mysql sqlite3 zip gd bcmath intl</code></td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">Composer</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Instalador oficial, em /usr/local/bin/composer</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">Node.js</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Via nodesource — versão à escolha, padrão 24</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">nginx</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Instalado e habilitado no boot</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">pnpm</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Habilitado via corepack (vem com o Node)</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-3 text-[var(--bright)]">apache2</td>
-                            <td class="px-4 py-3 text-[var(--dim)]">Desativado e removido se aparecer como dependência
-                                do PHP — aqui o site é servido por nginx
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <p class="mt-3 text-[15px] text-[var(--dim)]">Idempotente: o que já existe é pulado, então rodar de novo
-                    não quebra nada.</p>
+      <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">O que a instalação completa instala</h2>
+      <div class="mt-4 overflow-x-auto rounded-lg border border-[var(--line)]">
+        <table class="w-full min-w-[520px] text-left text-[15px]">
+          <thead class="bg-[var(--raise)] font-mono text-xs uppercase tracking-wider text-[var(--dim)]">
+            <tr><th class="px-4 py-3">Item</th><th class="px-4 py-3">Detalhes</th></tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--line)]">
+            <tr><td class="px-4 py-3 text-[var(--bright)]">PHP</td><td class="px-4 py-3 text-[var(--dim)]">Versão disponível no apt do sistema, com as extensões <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">cli fpm mbstring xml curl mysql sqlite3 zip gd bcmath intl</code></td></tr>
+            <tr><td class="px-4 py-3 text-[var(--bright)]">Composer</td><td class="px-4 py-3 text-[var(--dim)]">Instalador oficial, em /usr/local/bin/composer</td></tr>
+            <tr><td class="px-4 py-3 text-[var(--bright)]">Node.js</td><td class="px-4 py-3 text-[var(--dim)]">Via nodesource — menu com 26, 24 (padrão), 22 e 20</td></tr>
+            <tr><td class="px-4 py-3 text-[var(--bright)]">nginx</td><td class="px-4 py-3 text-[var(--dim)]">Instalado, habilitado no boot e configurado pro projeto se você informar o domínio</td></tr>
+            <tr><td class="px-4 py-3 text-[var(--bright)]">pnpm</td><td class="px-4 py-3 text-[var(--dim)]">Habilitado via corepack (vem com o Node)</td></tr>
+            <tr><td class="px-4 py-3 text-[var(--bright)]">apache2</td><td class="px-4 py-3 text-[var(--dim)]">Desativado e removido se aparecer como dependência do PHP — aqui o site é servido por nginx</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-3 text-[15px] text-[var(--dim)]">Idempotente: o que já existe é pulado, então rodar de novo não quebra nada.</p>
 
-                <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">Estrutura de pastas no
-                    servidor</h2>
-                <p class="mt-2 text-[var(--dim)]">Como o projeto fica em <code
-                        class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">/var/www/projects</code>
-                    depois do setup e de alguns deploys:</p>
-                <div class="cb nowrap mt-3" data-label="/var/www/projects/meuprojeto">
+      <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">Estrutura de pastas no servidor</h2>
+      <p class="mt-2 text-[var(--dim)]">Como o projeto fica em <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">/var/www/projects</code> depois do setup e de alguns deploys:</p>
+      <div class="cb nowrap mt-3" data-label="/var/www/projects/meuprojeto">
         <pre><code>meuprojeto
 ├── current -> releases/2026-08-04-130511
 ├── releases
@@ -169,85 +119,95 @@
         │   ├── testing
         │   └── views
         └── logs</code></pre>
-                </div>
-                <ul class="mt-4 space-y-2 text-[15px] text-[var(--dim)]">
-                    <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current</code> — symlink
-                        pra release ativa. Aponte o <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">root</code> do nginx
-                        pra <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current/public</code>.
-                    </li>
-                    <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases</code> — uma
-                        pasta por deploy, nomeada pela data. Só as 3 mais novas ficam.
-                    </li>
-                    <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared</code> — o que
-                        sobrevive entre releases: o <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env</code> e o <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code>.
-                    </li>
-                </ul>
+      </div>
+      <ul class="mt-4 space-y-2 text-[15px] text-[var(--dim)]">
+        <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current</code> — symlink pra release ativa. Aponte o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">root</code> do nginx pra <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current/public</code>.</li>
+        <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases</code> — uma pasta por deploy, nomeada pela data. Só as 3 mais novas ficam.</li>
+        <li><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared</code> — o que sobrevive entre releases: o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env</code> e o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code>.</li>
+      </ul>
 
-                <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
-                    <p class="font-semibold text-[var(--bright)]">O .env é copiado, não é symlink</p>
-                    <p class="mt-1 text-[var(--dim)]">Repare na árvore: o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code> tem seta (é
-                        symlink pro <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/</code>), o
-                        <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env</code> não — cada
-                        release recebe uma cópia própria do <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code>,
-                        feita no momento do deploy.</p>
-                    <p class="mt-2 text-[var(--dim)]">Na prática: editar o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> não
-                        muda a release que está no ar — o valor novo só entra no próximo deploy. Pra valer agora, edite
-                        também o <code
-                                class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current/.env</code> e
-                        rode <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">artisan
-                            optimize</code>.</p>
-                </div>
+      <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
+        <p class="font-semibold text-[var(--bright)]">O .env é copiado, não é symlink</p>
+        <p class="mt-1 text-[var(--dim)]">Repare na árvore: o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code> tem seta (é symlink pro <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/</code>), o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env</code> não — cada release recebe uma cópia própria do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code>, feita no momento do deploy.</p>
+        <p class="mt-2 text-[var(--dim)]">Na prática: editar o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> não muda a release que está no ar — o valor novo só entra no próximo deploy. Pra valer agora, edite também o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current/.env</code> e rode <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">artisan optimize</code>.</p>
+      </div>
 
-                <p class="mt-8 text-[var(--dim)]">A cada release, rode o script gerado:</p>
-                <div class="cb mt-3" data-label="bash">
-                    <pre><code>./deploy-&lt;projeto&gt;.sh</code></pre>
-                </div>
+      <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">nginx do projeto</h2>
+      <p class="mt-2 text-[var(--dim)]">O setup pergunta o domínio: informando um, ele grava o arquivo abaixo em <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">/etc/nginx/sites-available/&lt;projeto&gt;</code>, habilita o site, testa com <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">nginx -t</code> e recarrega. Deixando vazio, use este modelo à mão:</p>
+      <div class="cb mt-3" data-label="/etc/nginx/sites-available/meuprojeto">
+        <pre><code>server {
+    listen 80;
+    listen [::]:80;
+    server_name seudominio.com.br;
 
-                <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">O que o deploy faz</h2>
-                <ul class="mt-4 space-y-3 text-[15px]">
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">01</span><span>Clone raso do branch numa release datada em <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases/</code></span>
-                    </li>
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">02</span><span>No primeiro deploy, cria o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> a partir do <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env.example</code> e roda o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">key:generate</code></span>
-                    </li>
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">03</span><span><strong
-                            class="font-semibold text-[var(--bright)]">Copia</strong> o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> pra dentro da release — o .env nunca é symlink — e liga o <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code> por symlink pro <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/</code></span></li>
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">04</span><span><code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">composer install --no-dev</code> e assets pelo lockfile (pnpm ou npm ci)</span>
-                    </li>
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">05</span><span><code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">migrate --force</code> + <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">artisan optimize</code></span>
-                    </li>
-                    <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">06</span><span>Troca atômica do symlink <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current</code>, mantém as 3 releases mais novas</span>
-                    </li>
-                </ul>
+    root /var/www/projects/meuprojeto/current/public;
+    index index.php;
+    charset utf-8;
 
-                <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
-                    <p class="font-semibold text-[var(--bright)]">pnpm</p>
-                    <p class="mt-1 text-[var(--dim)]">Fixe <code
-                            class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">"packageManager":
-                        "pnpm@10.12.1"</code> no package.json — sem isso o corepack baixa o pnpm mais novo, que pode
-                        exigir Node mais novo que o do servidor.</p>
-                </div>
-            </section>
-        </div>
-    </main>
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    client_max_body_size 32m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}</code></pre>
+      </div>
+      <p class="mt-3 text-[15px] text-[var(--dim)]">O <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$realpath_root</code> no lugar do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$document_root</code> é o que faz o PHP receber o caminho real da release (<code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases/2026-…</code>) em vez do caminho pelo symlink — sem isso o OPcache mistura releases. Pra HTTPS, veja <a class="text-[var(--accent)] hover:underline" href="ssl.html">Certificado SSL</a> e <a class="text-[var(--accent)] hover:underline" href="nginx.html">Nginx HTTPS</a>.</p>
+
+      <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
+        <p class="font-semibold text-[var(--bright)]">Se o servidor tiver mais de uma versão de PHP</p>
+        <p class="mt-1 text-[var(--dim)]">Versões convivem sem problema — o que quebra é o <strong class="font-semibold text-[var(--bright)]">CLI e o FPM apontarem para versões diferentes</strong>. O artisan e o composer rodam pelo PHP da linha de comando; o site roda pelo socket do FPM no <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">fastcgi_pass</code>. Se o CLI for 8.5 e só o FPM 8.3 estiver no ar, apontar pro socket 8.5 dá 502.</p>
+        <p class="mt-2 text-[var(--dim)]">O setup checa isso: usa o socket da versão do CLI se ele existir, senão cai no socket do FPM que está rodando e avisa da diferença. O deploy faz o mesmo no reload. Pra conferir à mão: <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">php -v</code> e <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">ls /run/php/</code>.</p>
+      </div>
+
+      <p class="mt-8 text-[var(--dim)]">O setup grava o script do projeto em <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">scripts/</code>, a partir do diretório onde você o rodou. A cada release:</p>
+      <div class="cb mt-3" data-label="bash">
+        <pre><code>./scripts/deploy-&lt;projeto&gt;.sh</code></pre>
+      </div>
+
+      <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">O que o deploy faz</h2>
+      <ul class="mt-4 space-y-3 text-[15px]">
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">01</span><span>Clone raso do branch numa release datada em <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases/</code></span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">02</span><span>No primeiro deploy, cria o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> a partir do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.env.example</code> e roda o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">key:generate</code></span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">03</span><span><strong class="font-semibold text-[var(--bright)]">Copia</strong> o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/.env</code> pra dentro da release — o .env nunca é symlink — e liga o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">storage</code> por symlink pro <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">shared/</code></span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">04</span><span><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">composer install --no-dev</code> e assets pelo lockfile (pnpm ou npm ci)</span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">05</span><span><code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">migrate --force</code> + <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">artisan optimize</code></span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">06</span><span>Troca atômica do symlink <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current</code>, mantém as 3 releases mais novas</span></li>
+        <li class="flex gap-3"><span class="font-mono text-[var(--accent)]">07</span><span>Recarrega o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">php-fpm</code> pra limpar o OPcache e o realpath cache</span></li>
+      </ul>
+
+      <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
+        <p class="font-semibold text-[var(--bright)]">Por que recarregar o php-fpm</p>
+        <p class="mt-1 text-[var(--dim)]">O PHP guarda em cache o bytecode (OPcache) e o caminho real de cada arquivo (realpath cache, 120s por padrão). Como o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">current</code> é um symlink, sem recarregar o FPM o site continua servindo o código da release anterior por alguns minutos depois do deploy.</p>
+        <p class="mt-2 text-[var(--dim)]">O deploy roda <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">systemctl reload php&lt;versão&gt;-fpm</code> logo após trocar o symlink, o que reinicia os workers e zera os dois caches sem derrubar requisição.</p>
+      </div>
+
+      <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
+        <p class="font-semibold text-[var(--bright)]">pnpm</p>
+        <p class="mt-1 text-[var(--dim)]">Fixe <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">"packageManager": "pnpm@10.12.1"</code> no package.json — sem isso o corepack baixa o pnpm mais novo, que pode exigir Node mais novo que o do servidor.</p>
+      </div>
+    </section>
+    </div>
+  </main>
 </div>
 
 </body>
