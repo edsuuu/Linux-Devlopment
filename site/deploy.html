@@ -171,7 +171,72 @@
     }
 }</code></pre>
       </div>
-      <p class="mt-3 text-[15px] text-[var(--dim)]">O <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$realpath_root</code> no lugar do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$document_root</code> é o que faz o PHP receber o caminho real da release (<code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases/2026-…</code>) em vez do caminho pelo symlink — sem isso o OPcache mistura releases. Pra HTTPS, veja <a class="text-[var(--accent)] hover:underline" href="ssl.html">Certificado SSL</a> e <a class="text-[var(--accent)] hover:underline" href="nginx.html">Nginx HTTPS</a>.</p>
+      <p class="mt-3 text-[15px] text-[var(--dim)]">O <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$realpath_root</code> no lugar do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">$document_root</code> é o que faz o PHP receber o caminho real da release (<code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">releases/2026-…</code>) em vez do caminho pelo symlink — sem isso o OPcache mistura releases.</p>
+
+      <h2 class="mt-8 font-display text-xl font-semibold text-[var(--bright)]">nginx com HTTPS</h2>
+      <p class="mt-2 text-[var(--dim)]">Emita o certificado primeiro (veja <a class="text-[var(--accent)] hover:underline" href="ssl.html">Certificado SSL</a>) — sem os arquivos <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">.pem</code> no lugar, o <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">nginx -t</code> falha. Com o certificado emitido, troque o conteúdo do arquivo do projeto por este: o primeiro <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">server</code> manda todo HTTP daquele domínio pro HTTPS, o segundo serve o site.</p>
+      <div class="cb mt-3" data-label="/etc/nginx/sites-available/meuprojeto">
+        <pre><code>server {
+    listen 80;
+    listen [::]:80;
+    server_name seudominio.com.br;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name seudominio.com.br;
+
+    ssl_certificate /etc/letsencrypt/live/seudominio.com.br/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/seudominio.com.br/privkey.pem;
+    ssl_trusted_certificate /etc/letsencrypt/live/seudominio.com.br/chain.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    root /var/www/projects/meuprojeto/current/public;
+    index index.php;
+    charset utf-8;
+
+    client_max_body_size 32m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}</code></pre>
+      </div>
+      <p class="mt-3 text-[var(--dim)]">Valide e recarregue:</p>
+      <div class="cb mt-3" data-label="bash">
+        <pre><code>sudo nginx -t
+sudo systemctl reload nginx</code></pre>
+      </div>
+      <p class="mt-3 text-[15px] text-[var(--dim)]">Confira o socket do <code class="rounded bg-[var(--raise)] px-1.5 py-0.5 font-mono text-sm">fastcgi_pass</code> e o domínio nos três lugares antes de recarregar. Config genérica de HTTPS, fora da estrutura de deploy: <a class="text-[var(--accent)] hover:underline" href="nginx.html">Nginx HTTPS</a>.</p>
 
       <div class="mt-6 rounded-lg border border-[var(--accent)]/30 bg-[var(--accent)]/5 p-4 text-[15px]">
         <p class="font-semibold text-[var(--bright)]">Se o servidor tiver mais de uma versão de PHP</p>
