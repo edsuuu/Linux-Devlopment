@@ -24,22 +24,14 @@ zsh
 ```bash
 sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
-### Instalar Spaceship Prompt
+### Instalar Spaceship Prompt + Autosuggestions + Syntax Highlighting
 
 ```bash
-git clone https://github.com/spaceship-prompt/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
-ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
-```
-
-### Instalar Zsh Autosuggestions
-```bash
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-```
-
-### Instalar Zsh Syntax Highlighting
-
-```bash
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+Z="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}" &&
+git clone --depth=1 https://github.com/spaceship-prompt/spaceship-prompt.git "$Z/themes/spaceship-prompt" &&
+ln -s "$Z/themes/spaceship-prompt/spaceship.zsh-theme" "$Z/themes/spaceship.zsh-theme" &&
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$Z/plugins/zsh-autosuggestions" &&
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$Z/plugins/zsh-syntax-highlighting"
 ```
 ### Configurar o bash Shell
 

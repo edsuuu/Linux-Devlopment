@@ -10,18 +10,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  postgres:
-    image: postgres:15
-    container_name: postgres_container
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
   minio:
     image: minio/minio:latest
     container_name: minio_container

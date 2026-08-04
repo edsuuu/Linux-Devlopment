@@ -11,13 +11,6 @@ if [ "$(id -u)" -eq 0 ]; then
     SUDO=""
 fi
 
-ask() {
-    local ANSWER
-    read -rp "$1 [s/N]: " ANSWER
-    [[ "$ANSWER" =~ ^[sS] ]]
-}
-
-# roda um comando em background com spinner; em erro mostra o log do comando
 spin() {
     local MSG="$1"
     shift
@@ -41,71 +34,50 @@ spin() {
     fi
 }
 
-# ── provisionamento (cada item é opcional; responda N em tudo para pular) ──
+echo "O que voce quer fazer?"
+echo "  1) Instalacao completa — servidor (PHP + Composer, Node, nginx, pnpm) e depois o projeto"
+echo "  2) Apenas o projeto — servidor ja provisionado"
+read -rp "Opcao [1]: " MODE
+MODE="${MODE:-1}"
 
-INSTALL_PHP=0
-INSTALL_NODE=0
-INSTALL_NGINX=0
-INSTALL_PNPM=0
-NODE_VERSION="22"
+if [ "$MODE" = "1" ]; then
+    read -rp "Versao do Node [24]: " NODE_VERSION
+    NODE_VERSION="${NODE_VERSION:-24}"
 
-if ask "Instalar PHP + Composer"; then
-    INSTALL_PHP=1
-fi
-
-if ask "Instalar Node"; then
-    INSTALL_NODE=1
-    read -rp "Versao do Node [22]: " NODE_VERSION_ANSWER
-    NODE_VERSION="${NODE_VERSION_ANSWER:-22}"
-fi
-
-if ask "Instalar nginx"; then
-    INSTALL_NGINX=1
-fi
-
-if ask "Instalar pnpm (via corepack, precisa do Node)"; then
-    INSTALL_PNPM=1
-fi
-
-if [ "$INSTALL_PNPM" -eq 1 ] && [ "$INSTALL_NODE" -eq 0 ] && ! command -v node > /dev/null; then
-    echo "[ERRO] pnpm precisa do Node — responda sim para o Node ou instale-o antes" >&2
-    exit 1
-fi
-
-if [ "$INSTALL_PHP" -eq 1 ] || [ "$INSTALL_NODE" -eq 1 ] || [ "$INSTALL_NGINX" -eq 1 ] || [ "$INSTALL_PNPM" -eq 1 ]; then
     spin "preparando apt" $SUDO apt-get update -qq
     spin "instalando dependencias base" $SUDO apt-get install -y -qq curl ca-certificates gnupg
-fi
 
-if [ "$INSTALL_PHP" -eq 1 ]; then
-    # ponytail: php-{cli,fpm,...} sem o metapacote "php" — o meta puxaria apache2, e o deploy usa nginx
-    spin "instalando PHP (versao disponivel no apt)" $SUDO apt-get install -y -qq php-{cli,fpm,mbstring,xml,curl,mysql,sqlite3,zip,gd,bcmath,intl}
-    if ! command -v composer > /dev/null; then
+    spin "instalando PHP + extensoes (versao disponivel no apt)" \
+        $SUDO apt-get install -y -qq php-{cli,fpm,mbstring,xml,curl,mysql,sqlite3,zip,gd,bcmath,intl}
+
+    APACHE_PKGS="$(dpkg-query -W -f='${binary:Package} ${db:Status-Status}\n' 'apache2*' 'libapache2-mod-php*' 2> /dev/null | awk '$2 == "installed" { print $1 }' || true)"
+    if [ -n "$APACHE_PKGS" ]; then
+        $SUDO systemctl disable --now apache2 2> /dev/null || true
+        spin "removendo apache2 (o deploy usa nginx)" $SUDO apt-get purge -y -qq $APACHE_PKGS
+        spin "limpando dependencias orfas" $SUDO apt-get autoremove -y -qq
+    fi
+
+    if command -v composer > /dev/null; then
+        echo "[INFO] Composer ja instalado: $(composer --version) — pulando"
+    else
         spin "instalando Composer" bash -c "curl -fsSL https://getcomposer.org/installer | $SUDO php -- --install-dir=/usr/local/bin --filename=composer"
     fi
-fi
 
-if [ "$INSTALL_NODE" -eq 1 ]; then
-    spin "adicionando repositorio Node $NODE_VERSION (nodesource)" bash -c "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | $SUDO bash -"
+    spin "adicionando repositorio do Node $NODE_VERSION (nodesource)" \
+        bash -c "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | $SUDO bash -"
     spin "instalando Node" $SUDO apt-get install -y -qq nodejs
-fi
 
-if [ "$INSTALL_NGINX" -eq 1 ]; then
     if command -v nginx > /dev/null; then
         echo "[INFO] nginx ja instalado: $(nginx -v 2>&1) — pulando"
     else
         spin "instalando nginx" $SUDO apt-get install -y -qq nginx
-        $SUDO systemctl enable nginx 2>/dev/null || true
+        $SUDO systemctl enable --now nginx 2> /dev/null || true
     fi
-fi
 
-if [ "$INSTALL_PNPM" -eq 1 ]; then
     echo "[INFO] habilitando pnpm via corepack"
     $SUDO corepack enable
     echo "[INFO] fixe a versao no projeto: \"packageManager\": \"pnpm@10.12.1\" no package.json (sem isso o corepack baixa o pnpm mais novo, que pode exigir Node mais novo)"
 fi
-
-# ── estrutura do projeto + script de deploy ──
 
 read -rp "Nome do projeto: " PROJECT
 read -rp "URL SSH do repositorio: " REPOSITORY
@@ -148,7 +120,6 @@ if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
     cat "$HOME/.ssh/id_ed25519.pub"
 fi
 
-# rodando via "bash <(curl ...)" o template nao existe ao lado do script — baixa do repo
 TEMPLATE="$SCRIPT_DIR/deploy.template.sh"
 if [ ! -f "$TEMPLATE" ]; then
     BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/scripts/deploy}"
