@@ -30,7 +30,7 @@ sudo usermod -aG docker $USER
 
 # Database && Apps
 ```bash
-mkdir -p "$HOME/database" && cd "$HOME/database" && curl -fsSL "https://raw.githubusercontent.com/edsuuu/ubuntu-info/refs/heads/main/Docker/docker-compose.yml" -o "$HOME/database/docker-compose.yml" && sudo docker compose -f "$HOME/database/docker-compose.yml" up -d
+mkdir -p "$HOME/database" && cd "$HOME/database" && curl -fsSL "https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/refs/heads/main/docs/docker-compose.yml" -o "$HOME/database/docker-compose.yml" && sudo docker compose -f "$HOME/database/docker-compose.yml" up -d
 ```
 
 - Para criar um DB dentro do container

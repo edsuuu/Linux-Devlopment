@@ -5,13 +5,13 @@ O script configura pacotes, ZSH, Node.js, PHP, Nginx/Apache, Docker e estrutura 
 ### Ubuntu / WSL
 
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
+bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/scripts/dev-machine-setup/setup.sh)
 ```
 
 ### Debian (ou sistemas minimalistas)
 
 ```bash
-sudo apt-get update && sudo apt-get install -y curl && bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/dev-machine-setup/setup.sh)
+sudo apt-get update && sudo apt-get install -y curl && bash <(curl -s https://raw.githubusercontent.com/edsuuu/Linux-Devlopment/main/scripts/dev-machine-setup/setup.sh)
 ```
 
 ## O que é instalado
@@ -35,7 +35,7 @@ Se preferir configurar manualmente cada componente:
 
 ### Terminal e ZSH
 
-[Configuração do ZSH](Terminal-ZSH/zsh.md)
+[Configuração do ZSH](docs/zsh.md)
 
 ### Node.js (Manual)
 
@@ -59,14 +59,15 @@ php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 ### Docker (Manual)
 
-[Guia do Docker](Docker/install.md)
+[Guia do Docker](docs/docker.md)
 
 ### SSH e Git
 
-[Configurar SSH](SSH/ssh.md)
+[Configurar SSH](docs/ssh.md)
 
 ### Projetos e Deploys
 
-- [Configuração de Projeto](ConfigProject/install.md)
-- [Certificado SSL](Deploy/certificado_ssl.md)
-- [Nginx HTTP/HTTPS](Deploy/nginx-HTTP.md)
+- [Certificado SSL](docs/certificado_ssl.md)
+- [Nginx HTTP](docs/nginx-HTTP.md)
+- [Nginx HTTPS](docs/nginx-HTTPS.md)
+- [Provisionamento e deploy de servidor (Laravel)](scripts/deploy/README.md)
